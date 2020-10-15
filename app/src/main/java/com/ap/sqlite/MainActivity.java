@@ -1,12 +1,11 @@
 package com.ap.sqlite;
-//part 2 complete
+//part 3 complete
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,10 +20,10 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton addRecordBtn;
     private RecyclerView recordsRv;
 
-//    DB helper
+    //    DB helper
     private MyDbHelper dbHelper;
 
-//    action bar
+    //    action bar
     ActionBar actionBar;
 
     @Override
@@ -50,22 +49,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                start add record activity
-                startActivity(new Intent(MainActivity.this, AddUpdateRecordActivity.class));
+                Intent intent = new Intent(MainActivity.this, AddUpdateRecordActivity.class);
+                intent.putExtra("isEditMode", false);   //  want to add new data, set false
+                startActivity(intent);
             }
         });
     }
 
     private void loadRecords() {
         AdapterRecord adapterRecord = new AdapterRecord(MainActivity.this,
-                dbHelper.getAllRecords(Constants.C_ADDED_TIMESTAMP+" DESC"));
+                dbHelper.getAllRecords(Constants.C_ADDED_TIMESTAMP + " DESC"));
 
         recordsRv.setAdapter(adapterRecord);
 
 //        set num of records
-        actionBar.setSubtitle("Total: "+dbHelper.getRecordsCount());
+        actionBar.setSubtitle("Total: " + dbHelper.getRecordsCount());
     }
 
-    private void searchRecords(String query){
+    private void searchRecords(String query) {
         AdapterRecord adapterRecord = new AdapterRecord(MainActivity.this,
                 dbHelper.searchRecords(query));
 
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        searchView
         MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView)item.getActionView();
+        SearchView searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

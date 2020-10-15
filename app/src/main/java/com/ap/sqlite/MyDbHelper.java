@@ -61,6 +61,34 @@ public class MyDbHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    //    update existing record to db
+    public void updateRecord(String id, String name, String image, String bio, String phone,
+                             String email, String dob, String addedTime, String updatedTime) {
+//        get writeable database because we want to write data
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+//        id will be inserted automatically as we set AUTOINCREMENT in query
+
+//        insert data
+        values.put(Constants.C_NAME, name);
+        values.put(Constants.C_IMAGE, image);
+        values.put(Constants.C_BIO, bio);
+        values.put(Constants.C_PHONE, phone);
+        values.put(Constants.C_EMAIL, email);
+        values.put(Constants.C_DOB, dob);
+        values.put(Constants.C_ADDED_TIMESTAMP, addedTime);
+        values.put(Constants.C_UPDATED_TIMESTAMP, updatedTime);
+
+//        insert row, it will return record id of saved record
+        db.update(Constants.TABLE_NAME, values,Constants.C_ID + " = ?", new String[]{id});
+
+//        close db connection
+        db.close();
+
+//        return id of inserted record
+    }
+
     //    get all data
     public ArrayList<ModelRecord> getAllRecords(String orderBy) {
 //        order by query will allow you to short data e.g. newest/oldest first, name ascending/descending

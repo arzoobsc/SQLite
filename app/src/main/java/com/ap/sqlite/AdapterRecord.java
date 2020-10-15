@@ -1,6 +1,8 @@
 package com.ap.sqlite;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -40,20 +42,20 @@ public class AdapterRecord extends RecyclerView.Adapter<AdapterRecord.HolderReco
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HolderRecord holder, int position) {
+    public void onBindViewHolder(@NonNull HolderRecord holder, final int position) {
 //        get data, set data, handel view clicks in this method
 
 //        get data
         ModelRecord model = recordsList.get(position);
         final String id = model.getId();
-        String name = model.getName();
-        String image = model.getImage();
-        String bio = model.getBio();
-        String phone = model.getPhone();
-        String email = model.getEmail();
-        String dob = model.getDob();
-        String addedTime = model.getAddedTime();
-        String updatedTime = model.getUpdatedTime();
+        final String name = model.getName();
+        final String image = model.getImage();
+        final String bio = model.getBio();
+        final String phone = model.getPhone();
+        final String email = model.getEmail();
+        final String dob = model.getDob();
+        final String addedTime = model.getAddedTime();
+        final String updatedTime = model.getUpdatedTime();
 
 //        set data to views
         holder.nameTv.setText(name);
@@ -85,9 +87,57 @@ public class AdapterRecord extends RecyclerView.Adapter<AdapterRecord.HolderReco
         holder.moreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                will implement letter
+//                show options menu
+                showMoreDialog(
+                        ""+position,
+                        ""+id,
+                        ""+name,
+                        ""+phone,
+                        ""+email,
+                        ""+dob,
+                        ""+bio,
+                        ""+image,
+                        ""+addedTime,
+                        ""+updatedTime);
             }
         });
+    }
+
+    private void showMoreDialog(final String position, final String id, final String name, final String phone,
+                                final String email, final String dob,final String bio, final String image,
+                                final String addedTime, final String updatedTime) {
+//        options to display in dialog
+        String[] options = {"Edit", "Delete"};
+//        dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        add items to dialog
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                if (which == 0){
+//                    Edit is clicked
+
+//                    start AddUpdateRecordActivity to update existing record
+                    Intent intent = new Intent(context, AddUpdateRecordActivity.class);
+                    intent.putExtra("POSITION", position);
+                    intent.putExtra("ID", id);
+                    intent.putExtra("NAME", name);
+                    intent.putExtra("PHONE", phone);
+                    intent.putExtra("EMAIL", email);
+                    intent.putExtra("DOB", dob);
+                    intent.putExtra("BIO", bio);
+                    intent.putExtra("IMAGE", image);
+                    intent.putExtra("ADDED_TIME", addedTime);
+                    intent.putExtra("UPDATED_TIME", updatedTime);
+                    intent.putExtra("isEditMode", true);    //  need to update existing data, set true
+                    context.startActivity(intent);
+                }else if (which == 1){
+//                    Delete is clicked
+                }
+            }
+        });
+//        show dialog
+        builder.create().show();
     }
 
     @Override

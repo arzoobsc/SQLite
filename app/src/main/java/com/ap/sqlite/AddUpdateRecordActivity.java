@@ -43,7 +43,8 @@ public class AddUpdateRecordActivity extends AppCompatActivity {
     private String[] storagePermissions; //  only storage
     //    variables     (will contain data to save)
     private Uri imageUri;
-    private String name, phone, email, dob, bio;
+    private String id, name, phone, email, dob, bio, addedTime, updatedTime;
+    private boolean isEditMode = false;
 
     //    db helper
     private MyDbHelper dbHelper;
@@ -72,6 +73,43 @@ public class AddUpdateRecordActivity extends AppCompatActivity {
         dobEt = findViewById(R.id.dobEt);
         bioEt = findViewById(R.id.bioEt);
         saveBtn = findViewById(R.id.saveBtn);
+
+//        get data from intent
+        Intent intent = getIntent();
+        isEditMode = intent.getBooleanExtra("isEditMode", false);
+        if (isEditMode) {
+//            updating data
+
+            actionBar.setTitle("Update Data");
+
+            id = intent.getStringExtra("ID");
+            name = intent.getStringExtra("NAME");
+            phone = intent.getStringExtra("PHONE");
+            email = intent.getStringExtra("EMAIL");
+            dob = intent.getStringExtra("DOB");
+            bio = intent.getStringExtra("BIO");
+            imageUri = Uri.parse(intent.getStringExtra("IMAGE"));
+            addedTime = intent.getStringExtra("ADDED_TIME");
+            updatedTime = intent.getStringExtra("UPDATED_TIME");
+
+//            set data to views
+            nameEt.setText(name);
+            phoneEt.setText(phone);
+            emailEt.setText(email);
+            dobEt.setText(dob);
+            bioEt.setText(bio);
+
+//            if no image was selected while adding data, imageUri value will be "null"
+            if (imageUri.toString().equals("nill")) {
+//                no image, set default
+                profileIv.setImageResource(R.drawable.ic_person_black);
+            } else {
+//                have image, set
+                profileIv.setImageURI(imageUri);
+            }
+        } else {
+//            add data
+        }
 
 //        init db helper
         dbHelper = new MyDbHelper(this);
@@ -106,19 +144,39 @@ public class AddUpdateRecordActivity extends AppCompatActivity {
         dob = "" + dobEt.getText().toString().trim();
         bio = "" + bioEt.getText().toString().trim();
 
-//        save to db
-        String timestamp = "" + System.currentTimeMillis();
-        long id = dbHelper.insertRecord(
-                "" + name,
-                "" + imageUri,
-                "" + bio,
-                "" + phone,
-                "" + email,
-                "" + dob,
-                "" + timestamp,
-                "" + timestamp);
+        if (isEditMode) {
+//            update data
 
-        Toast.makeText(this, "Record added against ID: " + id, Toast.LENGTH_SHORT).show();
+            String timestamp = ""+System.currentTimeMillis();
+            dbHelper.updateRecord(
+                    ""+id,
+                    ""+name,
+                    ""+imageUri,
+                    ""+bio,
+                    ""+phone,
+                    ""+email,
+                    ""+dob,
+                    ""+addedTime,   //  added time will be same
+                    ""+timestamp    //updated time will be changed
+            );
+            Toast.makeText(this, "Updated...", Toast.LENGTH_SHORT).show();
+        } else {
+//            new data
+
+            //        save to db
+            String timestamp = "" + System.currentTimeMillis();
+            long id = dbHelper.insertRecord(
+                    "" + name,
+                    "" + imageUri,
+                    "" + bio,
+                    "" + phone,
+                    "" + email,
+                    "" + dob,
+                    "" + timestamp,
+                    "" + timestamp);
+            Toast.makeText(this, "Record added against ID: " + id, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void imagePickDialog() {
