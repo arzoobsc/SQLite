@@ -26,10 +26,15 @@ public class AdapterRecord extends RecyclerView.Adapter<AdapterRecord.HolderReco
     private Context context;
     private ArrayList<ModelRecord> recordsList;
 
+//    DB helper
+    MyDbHelper dbHelper;
+
     //    constructor
     public AdapterRecord(Context context, ArrayList<ModelRecord> recordsList) {
         this.context = context;
         this.recordsList = recordsList;
+
+        dbHelper = new MyDbHelper(context);
     }
 
     @NonNull
@@ -133,6 +138,9 @@ public class AdapterRecord extends RecyclerView.Adapter<AdapterRecord.HolderReco
                     context.startActivity(intent);
                 }else if (which == 1){
 //                    Delete is clicked
+                    dbHelper.deleteData(id);
+//                    refreshing record by calling activitie's onResume method
+                    ((MainActivity)context).onResume();
                 }
             }
         });

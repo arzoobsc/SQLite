@@ -1,11 +1,14 @@
 package com.ap.sqlite;
-//part 3 complete
+//part 4 complete
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -26,6 +29,15 @@ public class MainActivity extends AppCompatActivity {
     //    action bar
     ActionBar actionBar;
 
+    //    sort options
+    String orderByNewest = Constants.C_ADDED_TIMESTAMP + " DESC";
+    String orderByOldest = Constants.C_ADDED_TIMESTAMP + " ASC";
+    String orderByTitleAsc = Constants.C_NAME + " ASC";
+    String orderByTitleDesc = Constants.C_NAME + " DESC";
+
+    //    for refreshing records, refresh with last choosen sort option
+    String currentOrderByStatus = orderByNewest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
 //        init db helper class
         dbHelper = new MyDbHelper(this);
 
-//        loads records
-        loadRecords();
+//        loads records (by default newest first)
+        loadRecords(orderByNewest);
 
 //        click to start add record activity
         addRecordBtn.setOnClickListener(new View.OnClickListener() {
@@ -56,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loadRecords() {
+    private void loadRecords(String orderBy) {
+        currentOrderByStatus = orderBy;
+
         AdapterRecord adapterRecord = new AdapterRecord(MainActivity.this,
-                dbHelper.getAllRecords(Constants.C_ADDED_TIMESTAMP + " DESC"));
+                dbHelper.getAllRecords(orderBy));
 
         recordsRv.setAdapter(adapterRecord);
 
@@ -76,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadRecords();  //  refresh records list
+        loadRecords(currentOrderByStatus);  //  refresh records list
     }
 
     @Override
@@ -108,6 +122,41 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 //        handle menu items
+        int id = item.getItemId();
+        if (id == R.id.action_sort) {
+//            show sort options (show in dialog)
+            sortOptionDialog();
+        }else if (id == R.id.action_delete) {
+//            delete all records
+            dbHelper.deleteAllData();
+            onResume();
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sortOptionDialog() {
+//        options to display in dialog
+        String[] options = {"Title Ascending", "Title Descending", "Newest", "Oldest"};
+//        dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sort By")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 0) {
+//                            title ascending
+                            loadRecords(orderByTitleAsc);
+                        } else if (i == 1) {
+//                            title descending
+                            loadRecords(orderByTitleDesc);
+                        } else if (i == 2) {
+//                            Newest
+                            loadRecords(orderByNewest);
+                        } else if (i == 3) {
+//                            Oldest
+                            loadRecords(orderByOldest);
+                        }
+                    }
+                }).create().show(); //  show dialog
     }
 }
