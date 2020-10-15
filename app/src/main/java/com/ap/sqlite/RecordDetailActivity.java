@@ -90,7 +90,7 @@ public class RecordDetailActivity extends AppCompatActivity {
 
                 Calendar calendar2 = Calendar.getInstance(Locale.getDefault());
                 calendar2.setTimeInMillis(Long.parseLong(timestampUpdated));
-                String timeUpdate = ""+ DateFormat.format("dd/MM/yyyy hh:mm:aa", calendar1);
+                String timeUpdate = ""+ DateFormat.format("dd/MM/yyyy hh:mm:aa", calendar2);
 
 //                set data
                 nameTv.setText(name);
