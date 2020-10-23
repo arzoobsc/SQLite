@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,6 +107,7 @@ public class AdapterRecord extends RecyclerView.Adapter<AdapterRecord.HolderReco
                         ""+updatedTime);
             }
         });
+        Log.d("ImagePath", "onBindViewHolder: "+image);
     }
 
     private void showMoreDialog(final String position, final String id, final String name, final String phone,

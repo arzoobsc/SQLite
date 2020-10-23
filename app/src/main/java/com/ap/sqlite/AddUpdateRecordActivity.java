@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -24,6 +25,12 @@ import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 public class AddUpdateRecordActivity extends AppCompatActivity {
 
@@ -264,6 +271,62 @@ public class AddUpdateRecordActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, cameraPermissions, CAMERA_REQUEST_CODE);
     }
 
+    private void copyFileOrDirectory(String srcDir, String desDir){
+//        create folder in specific directory
+        try {
+            File src = new File(srcDir);
+            File des = new File(desDir, src.getName());
+            if (src.isDirectory()){
+                String[] files = src.list();
+                int filesLength = files.length;
+                for (String file: files){
+                    String src1 = new File(src, file).getPath();
+                    String des1 = des.getPath();
+
+                    copyFileOrDirectory(src1, des1);
+                }
+            }else {
+                copyFile(src, des);
+            }
+        }catch (Exception e){
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void copyFile(File srcDir, File desDir) throws IOException {
+        if (!desDir.getParentFile().exists()){
+            desDir.mkdirs();    //  create if not exist
+        }
+        if (!desDir.exists()){
+            desDir.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            source = new FileInputStream(srcDir).getChannel();
+            destination = new FileOutputStream(desDir).getChannel();
+            destination.transferFrom(source, 0, source.size());
+
+            imageUri = Uri.parse(desDir.getPath()); //  uri of saved image
+            Log.d("ImagePath", "copyFile: "+imageUri);
+        }catch (Exception e){
+//            if there is any error saving image
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+
+        }finally {
+//            close resources
+            if (source != null){
+                source.close();
+            }
+            if (destination != null){
+                destination.close();
+            }
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();    //  go back by clicking back button of actionbar
@@ -339,6 +402,9 @@ public class AddUpdateRecordActivity extends AppCompatActivity {
                     imageUri = resultUri;
 //                    set image
                     profileIv.setImageURI(resultUri);
+
+//                    documentation link of getDir() is available in description to learn more about it **part 05**
+                    copyFileOrDirectory(""+imageUri.getPath(), ""+getDir("SqliteRecordImages", MODE_PRIVATE));
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
 //                    error
                     Exception error = result.getError();
