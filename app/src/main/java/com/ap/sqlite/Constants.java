@@ -3,7 +3,7 @@ package com.ap.sqlite;
 public class Constants {
 
     //    db name
-    public static final String DB_NAME = "MY_RECORDS_DB";
+    public static final String DB_NAME = "MY_RECORDS_DB.db";
     //    db version
     public static final int DB_VERSION = 1;
     //    table name
