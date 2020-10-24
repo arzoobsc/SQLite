@@ -141,7 +141,7 @@ public class AdapterRecord extends RecyclerView.Adapter<AdapterRecord.HolderReco
                 }else if (which == 1){
 //                    Delete is clicked
                     dbHelper.deleteData(id);
-//                    refreshing record by calling activitie's onResume method
+//                    refreshing record by calling activity's onResume method
                     ((MainActivity)context).onResume();
                 }
             }
